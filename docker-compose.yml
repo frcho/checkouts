@@ -1,0 +1,37 @@
+version: '2.3'
+
+services:
+
+    checkouts-php:
+        image: php:7.1
+        environment:
+            APP_ENV: prod
+        networks:
+            checkouts:
+                aliases:
+                    - php
+            store:
+                aliases:
+                    - checkouts-php
+
+    checkouts-nginx:
+        build: 
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        networks:
+            checkouts:
+                aliases:
+                    - nginx
+            store:
+                aliases:
+                    - checkouts
+        labels:
+            - 'traefik.enable=true'
+            - 'traefik.frontend.rule=Host:checkouts.local'
+            - 'traefik.network=store'
+
+networks:
+    store:
+        external:
+            name: store
+    checkouts: ~
